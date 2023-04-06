@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.PaymentService.broker.JMSProducer;
 import com.ss.PaymentService.entity.Payment;
 import com.ss.PaymentService.exceptions.PaymentNotFoundException;
 import com.ss.PaymentService.service.PaymentRouteService;
@@ -25,6 +26,16 @@ public class PaymentRouteContoller {
 	
 	@Autowired  
 	PaymentRouteService PaymentRouteService;
+	
+	@Autowired
+    JMSProducer jmsProducer;
+
+    @PostMapping(value="/jms/payment")
+    public Payment sendMessage(@RequestBody Payment employee){
+    	Payment pay = PaymentRouteService.fetchBusPayment(employee.getPaymentId());
+        jmsProducer.sendMessage(pay);
+        return pay;
+    }
 	
 	
 	@GetMapping("/payment")  
